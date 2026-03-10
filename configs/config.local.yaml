@@ -1,0 +1,68 @@
+environment: local
+
+server:
+  host: 0.0.0.0
+  port: 4011
+  read_timeout: 15s
+  write_timeout: 15s
+  idle_timeout: 60s
+
+database:
+  host: localhost
+  port: 5432
+  user: admin
+  password: admin
+  db_name: order_db
+  schema: orders
+  sslmode: disable
+  max_open_conns: 25
+  max_idle_conns: 5
+  conn_max_lifetime: 5m
+
+jwt:
+  secret: "dev-super-secret-key-change-in-production-min-32-chars"
+  access_token_duration: 15m
+  issuer: "farmanexo-order-service"
+
+redis:
+  host: localhost
+  port: 6379
+  password: farmanexo2026
+  db: 0
+  max_retries: 3
+  pool_size: 10
+
+aws:
+  region: us-east-1
+  endpoint: "http://localhost:4566"
+
+sqs:
+  order_events_queue_url: "http://sqs.us-east-1.localhost.localstack.cloud:4566/000000000000/farmanexo-order-events"
+  catalog_events_queue_url: "http://sqs.us-east-1.localhost.localstack.cloud:4566/000000000000/farmanexo-catalog-events"
+  pharmacy_events_queue_url: "http://sqs.us-east-1.localhost.localstack.cloud:4566/000000000000/farmanexo-pharmacy-events"
+
+services:
+  catalog_service:
+    base_url: "http://localhost:4003"
+  pharmacy_service:
+    base_url: "http://localhost:4004"
+  user_service:
+    base_url: "http://localhost:4002"
+
+consumer:
+  enabled: true
+  poll_interval: 5s
+  max_messages: 10
+  visibility_timeout: 30
+
+payment:
+  mock_enabled: true
+  success_rate: 0.8
+
+delivery:
+  base_fee: 5.00
+  free_delivery_threshold: 50.00
+
+log:
+  level: debug
+  encoding: console

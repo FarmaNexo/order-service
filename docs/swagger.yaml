@@ -1,0 +1,732 @@
+basePath: /api/v1
+definitions:
+  github_com_farmanexo_order-service_internal_presentation_dto_requests.AddCartItemRequest:
+    properties:
+      pharmacy_id:
+        example: uuid
+        type: string
+      product_id:
+        example: uuid
+        type: string
+      quantity:
+        example: 2
+        type: integer
+    type: object
+  github_com_farmanexo_order-service_internal_presentation_dto_requests.CancelOrderRequest:
+    properties:
+      reason:
+        example: Cambié de opinión
+        type: string
+    type: object
+  github_com_farmanexo_order-service_internal_presentation_dto_requests.CheckoutRequest:
+    properties:
+      delivery_address_id:
+        example: uuid
+        type: string
+      delivery_method:
+        example: delivery
+        type: string
+      notes:
+        example: Entregar en recepción
+        type: string
+      payment_details:
+        $ref: '#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_requests.PaymentDetailsRequest'
+      payment_method:
+        example: card
+        type: string
+    type: object
+  github_com_farmanexo_order-service_internal_presentation_dto_requests.PaymentDetailsRequest:
+    properties:
+      card_token:
+        example: tok_xxx
+        type: string
+    type: object
+  github_com_farmanexo_order-service_internal_presentation_dto_requests.UpdateCartItemRequest:
+    properties:
+      quantity:
+        example: 3
+        type: integer
+    type: object
+  github_com_farmanexo_order-service_internal_presentation_dto_requests.UpdateOrderStatusRequest:
+    properties:
+      notes:
+        example: Pedido listo para recoger
+        type: string
+      status:
+        example: preparing
+        type: string
+    type: object
+  github_com_farmanexo_order-service_internal_presentation_dto_responses.CartItemResponse:
+    properties:
+      id:
+        type: string
+      pharmacy_id:
+        type: string
+      pharmacy_name:
+        type: string
+      product_id:
+        type: string
+      product_name:
+        type: string
+      quantity:
+        type: integer
+      stock_available:
+        type: integer
+      subtotal:
+        type: number
+      unit_price:
+        type: number
+    type: object
+  github_com_farmanexo_order-service_internal_presentation_dto_responses.CartResponse:
+    properties:
+      grouped_by_pharmacy:
+        items:
+          $ref: '#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_responses.PharmacyGroupResponse'
+        type: array
+      items:
+        items:
+          $ref: '#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_responses.CartItemResponse'
+        type: array
+      total_amount:
+        type: number
+      total_items:
+        type: integer
+      updated_at:
+        type: string
+      user_id:
+        type: string
+    type: object
+  github_com_farmanexo_order-service_internal_presentation_dto_responses.CheckoutOrderResponse:
+    properties:
+      delivery_fee:
+        type: number
+      order_id:
+        type: string
+      order_number:
+        type: string
+      pharmacy_id:
+        type: string
+      pharmacy_name:
+        type: string
+      status:
+        type: string
+      subtotal:
+        type: number
+      total:
+        type: number
+    type: object
+  github_com_farmanexo_order-service_internal_presentation_dto_responses.CheckoutResponse:
+    properties:
+      orders:
+        items:
+          $ref: '#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_responses.CheckoutOrderResponse'
+        type: array
+      payment_required:
+        type: boolean
+      total_amount:
+        type: number
+    type: object
+  github_com_farmanexo_order-service_internal_presentation_dto_responses.DeliveryAddressResponse:
+    properties:
+      city:
+        type: string
+      reference:
+        type: string
+      state:
+        type: string
+      street:
+        type: string
+    type: object
+  github_com_farmanexo_order-service_internal_presentation_dto_responses.EmptyResponse:
+    type: object
+  github_com_farmanexo_order-service_internal_presentation_dto_responses.OrderDetailResponse:
+    properties:
+      created_at:
+        type: string
+      delivery_address:
+        $ref: '#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_responses.DeliveryAddressResponse'
+      delivery_fee:
+        type: number
+      delivery_method:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_responses.OrderItemResponse'
+        type: array
+      notes:
+        type: string
+      order_id:
+        type: string
+      order_number:
+        type: string
+      payment_method:
+        type: string
+      payment_status:
+        type: string
+      pharmacy_id:
+        type: string
+      pharmacy_name:
+        type: string
+      status:
+        type: string
+      status_history:
+        items:
+          $ref: '#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_responses.StatusHistoryResponse'
+        type: array
+      subtotal:
+        type: number
+      total:
+        type: number
+      updated_at:
+        type: string
+      user_id:
+        type: string
+    type: object
+  github_com_farmanexo_order-service_internal_presentation_dto_responses.OrderItemResponse:
+    properties:
+      product_id:
+        type: string
+      product_name:
+        type: string
+      quantity:
+        type: integer
+      subtotal:
+        type: number
+      unit_price:
+        type: number
+    type: object
+  github_com_farmanexo_order-service_internal_presentation_dto_responses.OrderListResponse:
+    properties:
+      limit:
+        type: integer
+      orders:
+        items:
+          $ref: '#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_responses.OrderSummaryResponse'
+        type: array
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  github_com_farmanexo_order-service_internal_presentation_dto_responses.OrderStatsResponse:
+    properties:
+      avg_order_value:
+        type: number
+      by_status:
+        additionalProperties:
+          format: int64
+          type: integer
+        type: object
+      top_pharmacies:
+        items:
+          $ref: '#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_responses.TopPharmacyResponse'
+        type: array
+      total_orders:
+        type: integer
+      total_revenue:
+        type: number
+    type: object
+  github_com_farmanexo_order-service_internal_presentation_dto_responses.OrderSummaryResponse:
+    properties:
+      created_at:
+        type: string
+      items_count:
+        type: integer
+      order_id:
+        type: string
+      order_number:
+        type: string
+      pharmacy_id:
+        type: string
+      pharmacy_name:
+        type: string
+      status:
+        type: string
+      total:
+        type: number
+    type: object
+  github_com_farmanexo_order-service_internal_presentation_dto_responses.PharmacyGroupResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_responses.CartItemResponse'
+        type: array
+      items_count:
+        type: integer
+      pharmacy_id:
+        type: string
+      pharmacy_name:
+        type: string
+      subtotal:
+        type: number
+    type: object
+  github_com_farmanexo_order-service_internal_presentation_dto_responses.StatusHistoryResponse:
+    properties:
+      notes:
+        type: string
+      status:
+        type: string
+      timestamp:
+        type: string
+    type: object
+  github_com_farmanexo_order-service_internal_presentation_dto_responses.TopPharmacyResponse:
+    properties:
+      orders_count:
+        type: integer
+      pharmacy_id:
+        type: string
+      pharmacy_name:
+        type: string
+      revenue:
+        type: number
+    type: object
+  ? github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_CartResponse
+  : properties:
+      datos:
+        $ref: '#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_responses.CartResponse'
+      meta:
+        $ref: '#/definitions/github_com_farmanexo_order-service_internal_shared_common.Meta'
+    type: object
+  ? github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_CheckoutResponse
+  : properties:
+      datos:
+        $ref: '#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_responses.CheckoutResponse'
+      meta:
+        $ref: '#/definitions/github_com_farmanexo_order-service_internal_shared_common.Meta'
+    type: object
+  ? github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_EmptyResponse
+  : properties:
+      datos:
+        $ref: '#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_responses.EmptyResponse'
+      meta:
+        $ref: '#/definitions/github_com_farmanexo_order-service_internal_shared_common.Meta'
+    type: object
+  ? github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_OrderDetailResponse
+  : properties:
+      datos:
+        $ref: '#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_responses.OrderDetailResponse'
+      meta:
+        $ref: '#/definitions/github_com_farmanexo_order-service_internal_shared_common.Meta'
+    type: object
+  ? github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_OrderListResponse
+  : properties:
+      datos:
+        $ref: '#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_responses.OrderListResponse'
+      meta:
+        $ref: '#/definitions/github_com_farmanexo_order-service_internal_shared_common.Meta'
+    type: object
+  ? github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_OrderStatsResponse
+  : properties:
+      datos:
+        $ref: '#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_responses.OrderStatsResponse'
+      meta:
+        $ref: '#/definitions/github_com_farmanexo_order-service_internal_shared_common.Meta'
+    type: object
+  github_com_farmanexo_order-service_internal_shared_common.Meta:
+    properties:
+      idTransaccion:
+        type: string
+      mensajes:
+        items:
+          $ref: '#/definitions/github_com_farmanexo_order-service_internal_shared_common.ResponseMessage'
+        type: array
+      resultado:
+        type: boolean
+      timestamp:
+        type: string
+    type: object
+  github_com_farmanexo_order-service_internal_shared_common.ResponseMessage:
+    properties:
+      codigo:
+        type: string
+      mensaje:
+        type: string
+      tipo:
+        type: string
+    type: object
+host: localhost:4011
+info:
+  contact:
+    email: support@farmanexo.pe
+    name: FarmaNexo API Support
+    url: https://farmanexo.pe/support
+  description: Servicio de gestión de órdenes y carrito de compras para FarmaNexo
+    - Microservicio con CQRS y Clean Architecture
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: https://farmanexo.pe/terms
+  title: FarmaNexo Order Service API
+  version: "1.0"
+paths:
+  /api/v1/admin/orders:
+    get:
+      description: Lista todas las órdenes con filtros (admin)
+      parameters:
+      - description: Filtrar por usuario
+        in: query
+        name: user_id
+        type: string
+      - description: Filtrar por farmacia
+        in: query
+        name: pharmacy_id
+        type: string
+      - description: Filtrar por estado
+        in: query
+        name: status
+        type: string
+      - description: Fecha desde
+        in: query
+        name: date_from
+        type: string
+      - description: Fecha hasta
+        in: query
+        name: date_to
+        type: string
+      - default: 1
+        description: Página
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Límite
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_OrderListResponse'
+      security:
+      - BearerAuth: []
+      summary: Ver todas las órdenes (admin)
+      tags:
+      - Admin
+  /api/v1/admin/orders/stats:
+    get:
+      description: Obtiene estadísticas de órdenes
+      parameters:
+      - description: Fecha desde
+        in: query
+        name: date_from
+        type: string
+      - description: Fecha hasta
+        in: query
+        name: date_to
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_OrderStatsResponse'
+      security:
+      - BearerAuth: []
+      summary: Estadísticas de órdenes (admin)
+      tags:
+      - Admin
+  /api/v1/cart:
+    delete:
+      description: Elimina todos los items del carrito
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_EmptyResponse'
+      security:
+      - BearerAuth: []
+      summary: Vaciar carrito
+      tags:
+      - Cart
+    get:
+      description: Obtiene el carrito de compras del usuario autenticado
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_CartResponse'
+      security:
+      - BearerAuth: []
+      summary: Obtener carrito actual
+      tags:
+      - Cart
+  /api/v1/cart/items:
+    post:
+      consumes:
+      - application/json
+      description: Agrega un producto de una farmacia al carrito
+      parameters:
+      - description: Datos del item
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_requests.AddCartItemRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_CartResponse'
+      security:
+      - BearerAuth: []
+      summary: Agregar producto al carrito
+      tags:
+      - Cart
+  /api/v1/cart/items/{item_id}:
+    delete:
+      description: Elimina un item específico del carrito
+      parameters:
+      - description: ID del item
+        in: path
+        name: item_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_CartResponse'
+      security:
+      - BearerAuth: []
+      summary: Eliminar item del carrito
+      tags:
+      - Cart
+    put:
+      consumes:
+      - application/json
+      description: Actualiza la cantidad de un item en el carrito
+      parameters:
+      - description: ID del item
+        in: path
+        name: item_id
+        required: true
+        type: string
+      - description: Nueva cantidad
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_requests.UpdateCartItemRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_CartResponse'
+      security:
+      - BearerAuth: []
+      summary: Actualizar cantidad de un item
+      tags:
+      - Cart
+  /api/v1/orders:
+    get:
+      description: Lista las órdenes del usuario autenticado con paginación
+      parameters:
+      - description: Filtrar por estado
+        in: query
+        name: status
+        type: string
+      - default: 1
+        description: Página
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Límite
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_OrderListResponse'
+      security:
+      - BearerAuth: []
+      summary: Listar mis órdenes
+      tags:
+      - Orders
+  /api/v1/orders/{order_id}:
+    get:
+      description: Obtiene el detalle completo de una orden
+      parameters:
+      - description: ID de la orden
+        in: path
+        name: order_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_OrderDetailResponse'
+      security:
+      - BearerAuth: []
+      summary: Ver detalle de una orden
+      tags:
+      - Orders
+  /api/v1/orders/{order_id}/cancel:
+    post:
+      consumes:
+      - application/json
+      description: Cancela una orden (solo si está en pending_payment o confirmed)
+      parameters:
+      - description: ID de la orden
+        in: path
+        name: order_id
+        required: true
+        type: string
+      - description: Motivo de cancelación
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_requests.CancelOrderRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_OrderDetailResponse'
+      security:
+      - BearerAuth: []
+      summary: Cancelar orden
+      tags:
+      - Orders
+  /api/v1/orders/checkout:
+    post:
+      consumes:
+      - application/json
+      description: 'Procesa el checkout: crea órdenes separadas por farmacia y procesa
+        el pago'
+      parameters:
+      - description: Datos del checkout
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_requests.CheckoutRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_CheckoutResponse'
+      security:
+      - BearerAuth: []
+      summary: Crear órdenes desde carrito
+      tags:
+      - Orders
+  /api/v1/pharmacy/orders:
+    get:
+      description: Lista las órdenes de la farmacia del usuario (pharmacy_owner)
+      parameters:
+      - description: Filtrar por estado
+        in: query
+        name: status
+        type: string
+      - default: 1
+        description: Página
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Límite
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_OrderListResponse'
+      security:
+      - BearerAuth: []
+      summary: Ver órdenes de mi farmacia
+      tags:
+      - Pharmacy
+  /api/v1/pharmacy/orders/{order_id}/status:
+    put:
+      consumes:
+      - application/json
+      description: Actualiza el estado de una orden (pharmacy_owner)
+      parameters:
+      - description: ID de la orden
+        in: path
+        name: order_id
+        required: true
+        type: string
+      - description: Nuevo estado
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_requests.UpdateOrderStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_OrderDetailResponse'
+      security:
+      - BearerAuth: []
+      summary: Actualizar estado de orden
+      tags:
+      - Pharmacy
+  /health:
+    get:
+      description: Retorna el estado del servicio
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Servicio saludable
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Health check del servicio
+      tags:
+      - Health
+securityDefinitions:
+  BearerAuth:
+    description: 'JWT Authorization header using the Bearer scheme. Example: "Bearer
+      {token}"'
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
+tags:
+- description: Endpoints de carrito de compras
+  name: Cart
+- description: Endpoints de órdenes
+  name: Orders
+- description: Endpoints para encargados de farmacia
+  name: Pharmacy
+- description: Endpoints de administración
+  name: Admin
+- description: Endpoints de salud del servicio
+  name: Health

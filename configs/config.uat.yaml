@@ -1,0 +1,68 @@
+environment: uat
+
+server:
+  host: 0.0.0.0
+  port: 4011
+  read_timeout: 15s
+  write_timeout: 15s
+  idle_timeout: 60s
+
+database:
+  host: ${DB_HOST}
+  port: 5432
+  user: ${DB_USER}
+  password: ${DB_PASSWORD}
+  db_name: order_db
+  schema: orders
+  sslmode: require
+  max_open_conns: 20
+  max_idle_conns: 5
+  conn_max_lifetime: 5m
+
+jwt:
+  secret: ${JWT_SECRET}
+  access_token_duration: 15m
+  issuer: "farmanexo-order-service"
+
+redis:
+  host: ${REDIS_HOST}
+  port: 6379
+  password: ${REDIS_PASSWORD}
+  db: 0
+  max_retries: 3
+  pool_size: 10
+
+aws:
+  region: us-east-1
+  endpoint: ""
+
+sqs:
+  order_events_queue_url: ${SQS_ORDER_EVENTS_URL}
+  catalog_events_queue_url: ${SQS_CATALOG_EVENTS_URL}
+  pharmacy_events_queue_url: ${SQS_PHARMACY_EVENTS_URL}
+
+services:
+  catalog_service:
+    base_url: ${CATALOG_SERVICE_URL}
+  pharmacy_service:
+    base_url: ${PHARMACY_SERVICE_URL}
+  user_service:
+    base_url: ${USER_SERVICE_URL}
+
+consumer:
+  enabled: true
+  poll_interval: 5s
+  max_messages: 10
+  visibility_timeout: 30
+
+payment:
+  mock_enabled: false
+  success_rate: 1.0
+
+delivery:
+  base_fee: 5.00
+  free_delivery_threshold: 50.00
+
+log:
+  level: warn
+  encoding: json

@@ -1,0 +1,1135 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Servicio de gestión de órdenes y carrito de compras para FarmaNexo - Microservicio con CQRS y Clean Architecture",
+        "title": "FarmaNexo Order Service API",
+        "termsOfService": "https://farmanexo.pe/terms",
+        "contact": {
+            "name": "FarmaNexo API Support",
+            "url": "https://farmanexo.pe/support",
+            "email": "support@farmanexo.pe"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:4011",
+    "basePath": "/api/v1",
+    "paths": {
+        "/api/v1/admin/orders": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Lista todas las órdenes con filtros (admin)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Ver todas las órdenes (admin)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Filtrar por usuario",
+                        "name": "user_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por farmacia",
+                        "name": "pharmacy_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por estado",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Fecha desde",
+                        "name": "date_from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Fecha hasta",
+                        "name": "date_to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Página",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Límite",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_OrderListResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/orders/stats": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Obtiene estadísticas de órdenes",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Estadísticas de órdenes (admin)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Fecha desde",
+                        "name": "date_from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Fecha hasta",
+                        "name": "date_to",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_OrderStatsResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/cart": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Obtiene el carrito de compras del usuario autenticado",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cart"
+                ],
+                "summary": "Obtener carrito actual",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_CartResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Elimina todos los items del carrito",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cart"
+                ],
+                "summary": "Vaciar carrito",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_EmptyResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/cart/items": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Agrega un producto de una farmacia al carrito",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cart"
+                ],
+                "summary": "Agregar producto al carrito",
+                "parameters": [
+                    {
+                        "description": "Datos del item",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_requests.AddCartItemRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_CartResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/cart/items/{item_id}": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Actualiza la cantidad de un item en el carrito",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cart"
+                ],
+                "summary": "Actualizar cantidad de un item",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID del item",
+                        "name": "item_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Nueva cantidad",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_requests.UpdateCartItemRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_CartResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Elimina un item específico del carrito",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cart"
+                ],
+                "summary": "Eliminar item del carrito",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID del item",
+                        "name": "item_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_CartResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/orders": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Lista las órdenes del usuario autenticado con paginación",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Orders"
+                ],
+                "summary": "Listar mis órdenes",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Filtrar por estado",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Página",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Límite",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_OrderListResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/orders/checkout": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Procesa el checkout: crea órdenes separadas por farmacia y procesa el pago",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Orders"
+                ],
+                "summary": "Crear órdenes desde carrito",
+                "parameters": [
+                    {
+                        "description": "Datos del checkout",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_requests.CheckoutRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_CheckoutResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/orders/{order_id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Obtiene el detalle completo de una orden",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Orders"
+                ],
+                "summary": "Ver detalle de una orden",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID de la orden",
+                        "name": "order_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_OrderDetailResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/orders/{order_id}/cancel": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Cancela una orden (solo si está en pending_payment o confirmed)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Orders"
+                ],
+                "summary": "Cancelar orden",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID de la orden",
+                        "name": "order_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Motivo de cancelación",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_requests.CancelOrderRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_OrderDetailResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/pharmacy/orders": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Lista las órdenes de la farmacia del usuario (pharmacy_owner)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pharmacy"
+                ],
+                "summary": "Ver órdenes de mi farmacia",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Filtrar por estado",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Página",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Límite",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_OrderListResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/pharmacy/orders/{order_id}/status": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Actualiza el estado de una orden (pharmacy_owner)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pharmacy"
+                ],
+                "summary": "Actualizar estado de orden",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID de la orden",
+                        "name": "order_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Nuevo estado",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_requests.UpdateOrderStatusRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_OrderDetailResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/health": {
+            "get": {
+                "description": "Retorna el estado del servicio",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Health check del servicio",
+                "responses": {
+                    "200": {
+                        "description": "Servicio saludable",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "github_com_farmanexo_order-service_internal_presentation_dto_requests.AddCartItemRequest": {
+            "type": "object",
+            "properties": {
+                "pharmacy_id": {
+                    "type": "string",
+                    "example": "uuid"
+                },
+                "product_id": {
+                    "type": "string",
+                    "example": "uuid"
+                },
+                "quantity": {
+                    "type": "integer",
+                    "example": 2
+                }
+            }
+        },
+        "github_com_farmanexo_order-service_internal_presentation_dto_requests.CancelOrderRequest": {
+            "type": "object",
+            "properties": {
+                "reason": {
+                    "type": "string",
+                    "example": "Cambié de opinión"
+                }
+            }
+        },
+        "github_com_farmanexo_order-service_internal_presentation_dto_requests.CheckoutRequest": {
+            "type": "object",
+            "properties": {
+                "delivery_address_id": {
+                    "type": "string",
+                    "example": "uuid"
+                },
+                "delivery_method": {
+                    "type": "string",
+                    "example": "delivery"
+                },
+                "notes": {
+                    "type": "string",
+                    "example": "Entregar en recepción"
+                },
+                "payment_details": {
+                    "$ref": "#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_requests.PaymentDetailsRequest"
+                },
+                "payment_method": {
+                    "type": "string",
+                    "example": "card"
+                }
+            }
+        },
+        "github_com_farmanexo_order-service_internal_presentation_dto_requests.PaymentDetailsRequest": {
+            "type": "object",
+            "properties": {
+                "card_token": {
+                    "type": "string",
+                    "example": "tok_xxx"
+                }
+            }
+        },
+        "github_com_farmanexo_order-service_internal_presentation_dto_requests.UpdateCartItemRequest": {
+            "type": "object",
+            "properties": {
+                "quantity": {
+                    "type": "integer",
+                    "example": 3
+                }
+            }
+        },
+        "github_com_farmanexo_order-service_internal_presentation_dto_requests.UpdateOrderStatusRequest": {
+            "type": "object",
+            "properties": {
+                "notes": {
+                    "type": "string",
+                    "example": "Pedido listo para recoger"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "preparing"
+                }
+            }
+        },
+        "github_com_farmanexo_order-service_internal_presentation_dto_responses.CartItemResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "pharmacy_id": {
+                    "type": "string"
+                },
+                "pharmacy_name": {
+                    "type": "string"
+                },
+                "product_id": {
+                    "type": "string"
+                },
+                "product_name": {
+                    "type": "string"
+                },
+                "quantity": {
+                    "type": "integer"
+                },
+                "stock_available": {
+                    "type": "integer"
+                },
+                "subtotal": {
+                    "type": "number"
+                },
+                "unit_price": {
+                    "type": "number"
+                }
+            }
+        },
+        "github_com_farmanexo_order-service_internal_presentation_dto_responses.CartResponse": {
+            "type": "object",
+            "properties": {
+                "grouped_by_pharmacy": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_responses.PharmacyGroupResponse"
+                    }
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_responses.CartItemResponse"
+                    }
+                },
+                "total_amount": {
+                    "type": "number"
+                },
+                "total_items": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_farmanexo_order-service_internal_presentation_dto_responses.CheckoutOrderResponse": {
+            "type": "object",
+            "properties": {
+                "delivery_fee": {
+                    "type": "number"
+                },
+                "order_id": {
+                    "type": "string"
+                },
+                "order_number": {
+                    "type": "string"
+                },
+                "pharmacy_id": {
+                    "type": "string"
+                },
+                "pharmacy_name": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "subtotal": {
+                    "type": "number"
+                },
+                "total": {
+                    "type": "number"
+                }
+            }
+        },
+        "github_com_farmanexo_order-service_internal_presentation_dto_responses.CheckoutResponse": {
+            "type": "object",
+            "properties": {
+                "orders": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_responses.CheckoutOrderResponse"
+                    }
+                },
+                "payment_required": {
+                    "type": "boolean"
+                },
+                "total_amount": {
+                    "type": "number"
+                }
+            }
+        },
+        "github_com_farmanexo_order-service_internal_presentation_dto_responses.DeliveryAddressResponse": {
+            "type": "object",
+            "properties": {
+                "city": {
+                    "type": "string"
+                },
+                "reference": {
+                    "type": "string"
+                },
+                "state": {
+                    "type": "string"
+                },
+                "street": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_farmanexo_order-service_internal_presentation_dto_responses.EmptyResponse": {
+            "type": "object"
+        },
+        "github_com_farmanexo_order-service_internal_presentation_dto_responses.OrderDetailResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "delivery_address": {
+                    "$ref": "#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_responses.DeliveryAddressResponse"
+                },
+                "delivery_fee": {
+                    "type": "number"
+                },
+                "delivery_method": {
+                    "type": "string"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_responses.OrderItemResponse"
+                    }
+                },
+                "notes": {
+                    "type": "string"
+                },
+                "order_id": {
+                    "type": "string"
+                },
+                "order_number": {
+                    "type": "string"
+                },
+                "payment_method": {
+                    "type": "string"
+                },
+                "payment_status": {
+                    "type": "string"
+                },
+                "pharmacy_id": {
+                    "type": "string"
+                },
+                "pharmacy_name": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "status_history": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_responses.StatusHistoryResponse"
+                    }
+                },
+                "subtotal": {
+                    "type": "number"
+                },
+                "total": {
+                    "type": "number"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_farmanexo_order-service_internal_presentation_dto_responses.OrderItemResponse": {
+            "type": "object",
+            "properties": {
+                "product_id": {
+                    "type": "string"
+                },
+                "product_name": {
+                    "type": "string"
+                },
+                "quantity": {
+                    "type": "integer"
+                },
+                "subtotal": {
+                    "type": "number"
+                },
+                "unit_price": {
+                    "type": "number"
+                }
+            }
+        },
+        "github_com_farmanexo_order-service_internal_presentation_dto_responses.OrderListResponse": {
+            "type": "object",
+            "properties": {
+                "limit": {
+                    "type": "integer"
+                },
+                "orders": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_responses.OrderSummaryResponse"
+                    }
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_farmanexo_order-service_internal_presentation_dto_responses.OrderStatsResponse": {
+            "type": "object",
+            "properties": {
+                "avg_order_value": {
+                    "type": "number"
+                },
+                "by_status": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                },
+                "top_pharmacies": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_responses.TopPharmacyResponse"
+                    }
+                },
+                "total_orders": {
+                    "type": "integer"
+                },
+                "total_revenue": {
+                    "type": "number"
+                }
+            }
+        },
+        "github_com_farmanexo_order-service_internal_presentation_dto_responses.OrderSummaryResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "items_count": {
+                    "type": "integer"
+                },
+                "order_id": {
+                    "type": "string"
+                },
+                "order_number": {
+                    "type": "string"
+                },
+                "pharmacy_id": {
+                    "type": "string"
+                },
+                "pharmacy_name": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "total": {
+                    "type": "number"
+                }
+            }
+        },
+        "github_com_farmanexo_order-service_internal_presentation_dto_responses.PharmacyGroupResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_responses.CartItemResponse"
+                    }
+                },
+                "items_count": {
+                    "type": "integer"
+                },
+                "pharmacy_id": {
+                    "type": "string"
+                },
+                "pharmacy_name": {
+                    "type": "string"
+                },
+                "subtotal": {
+                    "type": "number"
+                }
+            }
+        },
+        "github_com_farmanexo_order-service_internal_presentation_dto_responses.StatusHistoryResponse": {
+            "type": "object",
+            "properties": {
+                "notes": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_farmanexo_order-service_internal_presentation_dto_responses.TopPharmacyResponse": {
+            "type": "object",
+            "properties": {
+                "orders_count": {
+                    "type": "integer"
+                },
+                "pharmacy_id": {
+                    "type": "string"
+                },
+                "pharmacy_name": {
+                    "type": "string"
+                },
+                "revenue": {
+                    "type": "number"
+                }
+            }
+        },
+        "github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_CartResponse": {
+            "type": "object",
+            "properties": {
+                "datos": {
+                    "$ref": "#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_responses.CartResponse"
+                },
+                "meta": {
+                    "$ref": "#/definitions/github_com_farmanexo_order-service_internal_shared_common.Meta"
+                }
+            }
+        },
+        "github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_CheckoutResponse": {
+            "type": "object",
+            "properties": {
+                "datos": {
+                    "$ref": "#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_responses.CheckoutResponse"
+                },
+                "meta": {
+                    "$ref": "#/definitions/github_com_farmanexo_order-service_internal_shared_common.Meta"
+                }
+            }
+        },
+        "github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_EmptyResponse": {
+            "type": "object",
+            "properties": {
+                "datos": {
+                    "$ref": "#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_responses.EmptyResponse"
+                },
+                "meta": {
+                    "$ref": "#/definitions/github_com_farmanexo_order-service_internal_shared_common.Meta"
+                }
+            }
+        },
+        "github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_OrderDetailResponse": {
+            "type": "object",
+            "properties": {
+                "datos": {
+                    "$ref": "#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_responses.OrderDetailResponse"
+                },
+                "meta": {
+                    "$ref": "#/definitions/github_com_farmanexo_order-service_internal_shared_common.Meta"
+                }
+            }
+        },
+        "github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_OrderListResponse": {
+            "type": "object",
+            "properties": {
+                "datos": {
+                    "$ref": "#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_responses.OrderListResponse"
+                },
+                "meta": {
+                    "$ref": "#/definitions/github_com_farmanexo_order-service_internal_shared_common.Meta"
+                }
+            }
+        },
+        "github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_OrderStatsResponse": {
+            "type": "object",
+            "properties": {
+                "datos": {
+                    "$ref": "#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_responses.OrderStatsResponse"
+                },
+                "meta": {
+                    "$ref": "#/definitions/github_com_farmanexo_order-service_internal_shared_common.Meta"
+                }
+            }
+        },
+        "github_com_farmanexo_order-service_internal_shared_common.Meta": {
+            "type": "object",
+            "properties": {
+                "idTransaccion": {
+                    "type": "string"
+                },
+                "mensajes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_farmanexo_order-service_internal_shared_common.ResponseMessage"
+                    }
+                },
+                "resultado": {
+                    "type": "boolean"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_farmanexo_order-service_internal_shared_common.ResponseMessage": {
+            "type": "object",
+            "properties": {
+                "codigo": {
+                    "type": "string"
+                },
+                "mensaje": {
+                    "type": "string"
+                },
+                "tipo": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "description": "JWT Authorization header using the Bearer scheme. Example: \"Bearer {token}\"",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    },
+    "tags": [
+        {
+            "description": "Endpoints de carrito de compras",
+            "name": "Cart"
+        },
+        {
+            "description": "Endpoints de órdenes",
+            "name": "Orders"
+        },
+        {
+            "description": "Endpoints para encargados de farmacia",
+            "name": "Pharmacy"
+        },
+        {
+            "description": "Endpoints de administración",
+            "name": "Admin"
+        },
+        {
+            "description": "Endpoints de salud del servicio",
+            "name": "Health"
+        }
+    ]
+}
