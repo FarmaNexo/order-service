@@ -3,7 +3,7 @@
 # ========================================
 # Stage 1: Builder
 # ========================================
-FROM golang:1.22-alpine AS builder
+FROM golang:1.25-alpine AS builder
 
 # Instalar dependencias del sistema
 RUN apk add --no-cache git ca-certificates tzdata
@@ -17,8 +17,14 @@ COPY go.mod go.sum ./
 # Descargar dependencias
 RUN go mod download
 
+# Instalar swag CLI y generar Swagger docs
+RUN go install github.com/swaggo/swag/cmd/swag@latest
+
 # Copiar código fuente
 COPY . .
+
+# Generar Swagger docs
+RUN swag init -g cmd/server/main.go --output docs --parseDependency --parseInternal
 
 # Compilar binario
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
