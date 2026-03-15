@@ -8,10 +8,10 @@ server:
   idle_timeout: 60s
 
 database:
-  host: ${DB_HOST}
+  host: "${DB_HOST}"
   port: 5432
-  user: ${DB_USER}
-  password: ${DB_PASSWORD}
+  user: "${DB_USER}"
+  password: "${DB_PASSWORD}"
   db_name: order_db
   schema: orders
   sslmode: require
@@ -20,34 +20,34 @@ database:
   conn_max_lifetime: 5m
 
 jwt:
-  secret: ${JWT_SECRET}
+  secret: "${JWT_SECRET}"
   access_token_duration: 15m
   issuer: "farmanexo-order-service"
 
 redis:
-  host: ${REDIS_HOST}
+  host: "${REDIS_HOST}"
   port: 6379
-  password: ${REDIS_PASSWORD}
+  password: "${REDIS_PASSWORD}"
   db: 0
   max_retries: 3
   pool_size: 10
 
 aws:
-  region: us-east-1
+  region: "${AWS_REGION}"
   endpoint: ""
 
 sqs:
-  order_events_queue_url: ${SQS_ORDER_EVENTS_URL}
-  catalog_events_queue_url: ${SQS_CATALOG_EVENTS_URL}
-  pharmacy_events_queue_url: ${SQS_PHARMACY_EVENTS_URL}
+  order_events_queue_url: "${SQS_ORDER_EVENTS_URL}"
+  catalog_events_queue_url: "${SQS_CATALOG_EVENTS_URL}"
+  pharmacy_events_queue_url: "${SQS_PHARMACY_EVENTS_URL}"
 
 services:
   catalog_service:
-    base_url: ${CATALOG_SERVICE_URL}
+    base_url: "${CATALOG_SERVICE_URL}"
   pharmacy_service:
-    base_url: ${PHARMACY_SERVICE_URL}
+    base_url: "${PHARMACY_SERVICE_URL}"
   user_service:
-    base_url: ${USER_SERVICE_URL}
+    base_url: "${USER_SERVICE_URL}"
 
 consumer:
   enabled: true
