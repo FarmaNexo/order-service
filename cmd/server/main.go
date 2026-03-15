@@ -115,7 +115,7 @@ func main() {
 	}
 
 	// Redis Cache
-	redisClient, err := cache.NewRedisClient(cfg.Redis, zapLogger)
+	redisClient, err := cache.NewRedisClient(cfg.Redis, cfg.Environment, zapLogger)
 	if err != nil {
 		zapLogger.Fatal("Error inicializando Redis", zap.Error(err))
 	}
