@@ -37,7 +37,7 @@ func SetupRoutes(
 	))
 
 	// Health
-	r.Get("/health", orderController.HealthCheck)
+	r.Get("/orders/health", orderController.HealthCheck)
 	r.Get("/", orderController.HealthCheck)
 
 	// API v1
