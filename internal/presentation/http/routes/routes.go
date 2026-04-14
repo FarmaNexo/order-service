@@ -56,28 +56,31 @@ func SetupRoutes(
 				r.Delete("/items/{item_id}", orderController.RemoveCartItem)
 			})
 
-			// Order endpoints (user)
+			// Order endpoints
 			r.Route("/orders", func(r chi.Router) {
+				// User endpoints
 				r.Get("/", orderController.ListMyOrders)
 				r.Post("/checkout", orderController.Checkout)
+
+				// Pharmacy endpoints (pharmacy_owner)
+				r.Route("/pharmacy", func(r chi.Router) {
+					r.Use(authMiddleware.RequirePharmacyOwner)
+
+					r.Get("/", orderController.ListPharmacyOrders)
+					r.Put("/{order_id}/status", orderController.UpdateOrderStatus)
+				})
+
+				// Admin endpoints
+				r.Route("/admin", func(r chi.Router) {
+					r.Use(authMiddleware.RequireAdmin)
+
+					r.Get("/", orderController.ListAllOrders)
+					r.Get("/stats", orderController.GetOrderStats)
+				})
+
+				// User order detail (param routes last — chi prioritizes static anyway)
 				r.Get("/{order_id}", orderController.GetOrderDetail)
 				r.Post("/{order_id}/cancel", orderController.CancelOrder)
-			})
-
-			// Pharmacy endpoints (pharmacy_owner)
-			r.Route("/pharmacy", func(r chi.Router) {
-				r.Use(authMiddleware.RequirePharmacyOwner)
-
-				r.Get("/orders", orderController.ListPharmacyOrders)
-				r.Put("/orders/{order_id}/status", orderController.UpdateOrderStatus)
-			})
-
-			// Admin endpoints
-			r.Route("/admin", func(r chi.Router) {
-				r.Use(authMiddleware.RequireAdmin)
-
-				r.Get("/orders", orderController.ListAllOrders)
-				r.Get("/orders/stats", orderController.GetOrderStats)
 			})
 		})
 	})

@@ -24,116 +24,6 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/admin/orders": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Lista todas las órdenes con filtros (admin)",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Admin"
-                ],
-                "summary": "Ver todas las órdenes (admin)",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Filtrar por usuario",
-                        "name": "user_id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filtrar por farmacia",
-                        "name": "pharmacy_id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filtrar por estado",
-                        "name": "status",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Fecha desde",
-                        "name": "date_from",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Fecha hasta",
-                        "name": "date_to",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "default": 1,
-                        "description": "Página",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "default": 10,
-                        "description": "Límite",
-                        "name": "limit",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_OrderListResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/admin/orders/stats": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Obtiene estadísticas de órdenes",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Admin"
-                ],
-                "summary": "Estadísticas de órdenes (admin)",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Fecha desde",
-                        "name": "date_from",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Fecha hasta",
-                        "name": "date_to",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_OrderStatsResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/api/v1/cart": {
             "get": {
                 "security": [
@@ -346,6 +236,116 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/orders/admin": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Lista todas las órdenes con filtros (admin)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Ver todas las órdenes (admin)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Filtrar por usuario",
+                        "name": "user_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por farmacia",
+                        "name": "pharmacy_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtrar por estado",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Fecha desde",
+                        "name": "date_from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Fecha hasta",
+                        "name": "date_to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Página",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Límite",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_OrderListResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/orders/admin/stats": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Obtiene estadísticas de órdenes",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Estadísticas de órdenes (admin)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Fecha desde",
+                        "name": "date_from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Fecha hasta",
+                        "name": "date_to",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_OrderStatsResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/orders/checkout": {
             "post": {
                 "security": [
@@ -380,6 +380,99 @@ const docTemplate = `{
                         "description": "Created",
                         "schema": {
                             "$ref": "#/definitions/github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_CheckoutResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/orders/pharmacy": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Lista las órdenes de la farmacia del usuario (pharmacy_owner)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pharmacy"
+                ],
+                "summary": "Ver órdenes de mi farmacia",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Filtrar por estado",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Página",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Límite",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_OrderListResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/orders/pharmacy/{order_id}/status": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Actualiza el estado de una orden (pharmacy_owner)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pharmacy"
+                ],
+                "summary": "Actualizar estado de orden",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID de la orden",
+                        "name": "order_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Nuevo estado",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_requests.UpdateOrderStatusRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_OrderDetailResponse"
                         }
                     }
                 }
@@ -452,99 +545,6 @@ const docTemplate = `{
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_requests.CancelOrderRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_OrderDetailResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/pharmacy/orders": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Lista las órdenes de la farmacia del usuario (pharmacy_owner)",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Pharmacy"
-                ],
-                "summary": "Ver órdenes de mi farmacia",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Filtrar por estado",
-                        "name": "status",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "default": 1,
-                        "description": "Página",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "default": 10,
-                        "description": "Límite",
-                        "name": "limit",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_OrderListResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/pharmacy/orders/{order_id}/status": {
-            "put": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Actualiza el estado de una orden (pharmacy_owner)",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Pharmacy"
-                ],
-                "summary": "Actualizar estado de orden",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "ID de la orden",
-                        "name": "order_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Nuevo estado",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/github_com_farmanexo_order-service_internal_presentation_dto_requests.UpdateOrderStatusRequest"
                         }
                     }
                 ],

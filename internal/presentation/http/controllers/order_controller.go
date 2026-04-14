@@ -288,7 +288,7 @@ func (c *OrderController) CancelOrder(w http.ResponseWriter, r *http.Request) {
 // @Param        page    query  int     false  "Página" default(1)
 // @Param        limit   query  int     false  "Límite" default(10)
 // @Success      200  {object}  common.ApiResponse[responses.OrderListResponse]
-// @Router       /api/v1/pharmacy/orders [get]
+// @Router       /api/v1/orders/pharmacy [get]
 func (c *OrderController) ListPharmacyOrders(w http.ResponseWriter, r *http.Request) {
 	userID, _ := middlewares.GetUserIDFromContext(r.Context())
 	status := r.URL.Query().Get("status")
@@ -319,7 +319,7 @@ func (c *OrderController) ListPharmacyOrders(w http.ResponseWriter, r *http.Requ
 // @Param        order_id  path  string  true  "ID de la orden"
 // @Param        body      body  requests.UpdateOrderStatusRequest  true  "Nuevo estado"
 // @Success      200  {object}  common.ApiResponse[responses.OrderDetailResponse]
-// @Router       /api/v1/pharmacy/orders/{order_id}/status [put]
+// @Router       /api/v1/orders/pharmacy/{order_id}/status [put]
 func (c *OrderController) UpdateOrderStatus(w http.ResponseWriter, r *http.Request) {
 	userID, _ := middlewares.GetUserIDFromContext(r.Context())
 	orderID := chi.URLParam(r, "order_id")
@@ -356,7 +356,7 @@ func (c *OrderController) UpdateOrderStatus(w http.ResponseWriter, r *http.Reque
 // @Param        page         query  int     false  "Página" default(1)
 // @Param        limit        query  int     false  "Límite" default(10)
 // @Success      200  {object}  common.ApiResponse[responses.OrderListResponse]
-// @Router       /api/v1/admin/orders [get]
+// @Router       /api/v1/orders/admin [get]
 func (c *OrderController) ListAllOrders(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 	page, _ := strconv.Atoi(q.Get("page"))
@@ -385,7 +385,7 @@ func (c *OrderController) ListAllOrders(w http.ResponseWriter, r *http.Request) 
 // @Param        date_from  query  string  false  "Fecha desde"
 // @Param        date_to    query  string  false  "Fecha hasta"
 // @Success      200  {object}  common.ApiResponse[responses.OrderStatsResponse]
-// @Router       /api/v1/admin/orders/stats [get]
+// @Router       /api/v1/orders/admin/stats [get]
 func (c *OrderController) GetOrderStats(w http.ResponseWriter, r *http.Request) {
 	query := queries.GetOrderStatsQuery{
 		DateFrom: r.URL.Query().Get("date_from"),

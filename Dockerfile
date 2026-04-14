@@ -20,6 +20,9 @@ RUN go mod download
 # Instalar swag CLI y generar Swagger docs
 RUN go install github.com/swaggo/swag/cmd/swag@latest
 
+# Instalar golang-migrate CLI (postgres driver, static binary en /go/bin)
+RUN go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@v4.17.0
+
 # Copiar código fuente
 COPY . .
 
@@ -52,6 +55,12 @@ COPY --from=builder /app/bin/order-service /app/order-service
 
 # Copiar configs
 COPY --from=builder /app/configs /app/configs
+
+# Migrations: binario migrate + SQL files + runner con URL-encode (para task efimero de CI)
+COPY --from=builder /go/bin/migrate /usr/local/bin/migrate
+COPY --from=builder /app/migrations /app/migrations
+COPY --from=builder /app/scripts/migrate-runner.sh /usr/local/bin/migrate-runner
+RUN chmod +x /usr/local/bin/migrate-runner
 
 # Cambiar ownership a appuser
 RUN chown -R appuser:appgroup /app

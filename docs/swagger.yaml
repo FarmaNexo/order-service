@@ -361,76 +361,6 @@ info:
   title: FarmaNexo Order Service API
   version: "1.0"
 paths:
-  /api/v1/admin/orders:
-    get:
-      description: Lista todas las órdenes con filtros (admin)
-      parameters:
-      - description: Filtrar por usuario
-        in: query
-        name: user_id
-        type: string
-      - description: Filtrar por farmacia
-        in: query
-        name: pharmacy_id
-        type: string
-      - description: Filtrar por estado
-        in: query
-        name: status
-        type: string
-      - description: Fecha desde
-        in: query
-        name: date_from
-        type: string
-      - description: Fecha hasta
-        in: query
-        name: date_to
-        type: string
-      - default: 1
-        description: Página
-        in: query
-        name: page
-        type: integer
-      - default: 10
-        description: Límite
-        in: query
-        name: limit
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_OrderListResponse'
-      security:
-      - BearerAuth: []
-      summary: Ver todas las órdenes (admin)
-      tags:
-      - Admin
-  /api/v1/admin/orders/stats:
-    get:
-      description: Obtiene estadísticas de órdenes
-      parameters:
-      - description: Fecha desde
-        in: query
-        name: date_from
-        type: string
-      - description: Fecha hasta
-        in: query
-        name: date_to
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_OrderStatsResponse'
-      security:
-      - BearerAuth: []
-      summary: Estadísticas de órdenes (admin)
-      tags:
-      - Admin
   /api/v1/cart:
     delete:
       description: Elimina todos los items del carrito
@@ -613,6 +543,76 @@ paths:
       summary: Cancelar orden
       tags:
       - Orders
+  /api/v1/orders/admin:
+    get:
+      description: Lista todas las órdenes con filtros (admin)
+      parameters:
+      - description: Filtrar por usuario
+        in: query
+        name: user_id
+        type: string
+      - description: Filtrar por farmacia
+        in: query
+        name: pharmacy_id
+        type: string
+      - description: Filtrar por estado
+        in: query
+        name: status
+        type: string
+      - description: Fecha desde
+        in: query
+        name: date_from
+        type: string
+      - description: Fecha hasta
+        in: query
+        name: date_to
+        type: string
+      - default: 1
+        description: Página
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Límite
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_OrderListResponse'
+      security:
+      - BearerAuth: []
+      summary: Ver todas las órdenes (admin)
+      tags:
+      - Admin
+  /api/v1/orders/admin/stats:
+    get:
+      description: Obtiene estadísticas de órdenes
+      parameters:
+      - description: Fecha desde
+        in: query
+        name: date_from
+        type: string
+      - description: Fecha hasta
+        in: query
+        name: date_to
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_farmanexo_order-service_internal_shared_common.ApiResponse-github_com_farmanexo_order-service_internal_presentation_dto_responses_OrderStatsResponse'
+      security:
+      - BearerAuth: []
+      summary: Estadísticas de órdenes (admin)
+      tags:
+      - Admin
   /api/v1/orders/checkout:
     post:
       consumes:
@@ -638,7 +638,7 @@ paths:
       summary: Crear órdenes desde carrito
       tags:
       - Orders
-  /api/v1/pharmacy/orders:
+  /api/v1/orders/pharmacy:
     get:
       description: Lista las órdenes de la farmacia del usuario (pharmacy_owner)
       parameters:
@@ -668,7 +668,7 @@ paths:
       summary: Ver órdenes de mi farmacia
       tags:
       - Pharmacy
-  /api/v1/pharmacy/orders/{order_id}/status:
+  /api/v1/orders/pharmacy/{order_id}/status:
     put:
       consumes:
       - application/json

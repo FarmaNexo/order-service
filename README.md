@@ -139,11 +139,11 @@ curl -X POST http://localhost:4011/api/v1/orders/{order_id}/cancel \
 
 ```bash
 # Ver órdenes de mi farmacia
-curl "http://localhost:4011/api/v1/pharmacy/orders?status=confirmed" \
+curl "http://localhost:4011/api/v1/orders/pharmacy?status=confirmed" \
   -H "Authorization: Bearer {token}"
 
 # Actualizar estado de orden
-curl -X PUT http://localhost:4011/api/v1/pharmacy/orders/{order_id}/status \
+curl -X PUT http://localhost:4011/api/v1/orders/pharmacy/{order_id}/status \
   -H "Authorization: Bearer {token}" \
   -H "Content-Type: application/json" \
   -d '{"status": "preparing", "notes": "Preparando pedido"}'
@@ -153,11 +153,11 @@ curl -X PUT http://localhost:4011/api/v1/pharmacy/orders/{order_id}/status \
 
 ```bash
 # Ver todas las órdenes
-curl "http://localhost:4011/api/v1/admin/orders?status=confirmed&page=1" \
+curl "http://localhost:4011/api/v1/orders/admin?status=confirmed&page=1" \
   -H "Authorization: Bearer {token}"
 
 # Estadísticas
-curl "http://localhost:4011/api/v1/admin/orders/stats?date_from=2026-01-01&date_to=2026-12-31" \
+curl "http://localhost:4011/api/v1/orders/admin/stats?date_from=2026-01-01&date_to=2026-12-31" \
   -H "Authorization: Bearer {token}"
 ```
 
