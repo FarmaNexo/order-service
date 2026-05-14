@@ -134,6 +134,68 @@ pending_payment → confirmed → preparing → ready → in_delivery → comple
 - **HU-045**: Notificación a farmacias (via SQS events)
 - **HU-046**: Gestión de órdenes (CRUD + status management)
 
+## Known Issues
+
+### K16 — order→pharmacy GetInventoryItem hits non-existent endpoint (detectado 2026-05-13)
+
+`internal/infrastructure/clients/pharmacy_client_impl.go:28` llama:
+```
+GET {PHARMACY}/api/v1/pharmacies/{pharmacyID}/inventory/{productID}
+```
+**Pero pharmacy-service NO expone esa ruta como GET.** Solo existen:
+- `GET /api/v1/pharmacies/{id}/inventory` (todo el inventario de una farmacia)
+- `GET /api/v1/pharmacies/inventory/product/{productId}` (cross-pharmacy comparator)
+- `PUT/DELETE /api/v1/pharmacies/{id}/inventory/{productId}` (admin owner)
+
+**Síntoma:** pharmacy responde `405 Method Not Allowed` (Allow: PUT, DELETE). order trata cualquier non-200 como error → response `400 BUS_001 "Producto no disponible en esta farmacia"`. Bloquea `POST /cart/items` para CUALQUIER combinación de producto+farmacia, incluso con stock disponible.
+
+**Reproducción** (con stack local up): `bash services/order-service/scripts/validate-e2e-local.sh` falla en STEP 7.
+
+**Scope:** afecta cart-add + posiblemente checkout (mismo client). Lado código (NO IaC).
+
+**Opciones de fix** (decidir antes de implementar):
+- (A) Agregar `GET /api/v1/pharmacies/{id}/inventory/{productId}` en pharmacy-service (handler nuevo + route). Más limpio, sigue REST.
+- (B) Cambiar `pharmacy_client_impl.go` para llamar `GET /api/v1/pharmacies/inventory/product/{productId}` y filtrar por `pharmacy_id` en el response.items[]. Una llamada de red potencialmente más grande pero reutiliza endpoint existente.
+
+**Recomendado: (A)** — el endpoint cross-pharmacy es para comparador público, no para validar 1 item. Separar concerns. Migration de código sola (no schema).
+
+**Estado:** ✅ resuelto 2026-05-13 (opción A). Pharmacy expone `GET /api/v1/pharmacies/{id}/inventory/{productId}` que devuelve `InventoryItemResponse` joined con `pharmacy_name/slug/district/address`. 404 cuando no existe inventory para ese par.
+
+### K18 — order→user GetAddress hits non-existent endpoint (detectado 2026-05-13)
+
+Mismo patrón que K16, lado user-service. `order-service/internal/infrastructure/clients/user_client_impl.go:28` invoca:
+```
+GET {USER}/api/v1/users/me/addresses/{addressID}
+```
+**user-service no expone esa ruta como GET.** Solo existen:
+- `GET /api/v1/users/me/addresses` (list)
+- `PUT /api/v1/users/me/addresses/{id}` (update, auth)
+- `DELETE /api/v1/users/me/addresses/{id}` (delete, auth)
+
+**Síntoma:** user-service responde `405 Method Not Allowed`. order trata non-200 como error → response `400 BUS_028 "Dirección de entrega no encontrada"`. Bloquea `POST /orders/checkout` para CUALQUIER address válida.
+
+**Reproducción:** STEP 9 de `validate-e2e-local.sh` (con K16 ya fixeado).
+
+**Scope:** afecta checkout. Lado código (no IaC).
+
+**Fix recomendado (opción A, simétrico al K16):** agregar handler `GetAddressByID` en user-service + ruta `GET /api/v1/users/me/addresses/{id}`. Mantiene la nomenclatura REST y reusa la repo existente. ~6 archivos (query, handler, controller method, route, main wiring, response DTO reuse).
+
+**Opción alternativa B:** cambiar order's `UserClient.GetAddress` para hacer `GET /addresses` (list) y filtrar por ID client-side. Una respuesta más grande pero sin tocar user-service. Aceptable mientras un usuario tenga pocas direcciones.
+
+### K17 — order no enriquece snapshot con catalog (detectado 2026-05-13)
+
+`add_cart_item_handler.go` hoy lee `ProductName` desde el response de pharmacy. Pero pharmacy **no es fuente de verdad** del nombre del producto — esa data vive en catalog. El endpoint `GET /pharmacies/{id}/inventory/{productId}` devuelve `product_name=""` intencionalmente (pharmacy no resuelve nombres cross-service).
+
+**Síntoma:** `cart_items.product_name` queda vacío. La columna es `NOT NULL DEFAULT ''`, por lo que no rompe el flujo. Pero el snapshot que se guarda en `order_items.product_snapshot` JSONB también queda con `ProductName=""`, lo cual degrada el UX cuando el usuario revisa una orden histórica.
+
+**Fix futuro:** en `AddCartItemHandler.Handle` (y el equivalente en `CheckoutHandler` si reutiliza el flujo), llamar a `catalogClient.GetProduct(ctx, productID)` para enriquecer `product_name`, y solo entonces persistir el `CartItem`. La env var `CATALOG_SERVICE_URL` ya está cableada (K15) — falta el call site.
+
+**Tech debt:** resolver antes de la primera demo con UX que muestre historial de órdenes, o antes de Sprint 4 si Alert Service va a leer `product_snapshot` para construir notificaciones legibles.
+
+### Tech debt — request logging middleware
+
+order-service no loggea requests HTTP por default (solo logs estructurados desde handlers). Diagnosticar issues cross-service (como K16) requirió curl directo a downstream para inferir el flujo. Agregar middleware Zap-based que loggee method+path+status+latency por request mejoraría observabilidad local. Pharmacy-service ya tiene `middleware.Logger` de chi — replicar el patrón.
+
 ## Coding Conventions
 
 - **CQRS**: Commands for writes, Queries for reads
