@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/farmanexo/order-service/internal/application/commands"
 	"github.com/farmanexo/order-service/internal/application/queries"
@@ -44,7 +45,7 @@ func (h *AddCartItemHandler) Handle(ctx context.Context, cmd commands.AddCartIte
 	}
 
 	if inventoryItem.Stock < cmd.Quantity {
-		return common.BadRequestResponse[responses.CartResponse](constants.CodeInsufficientStock, "Stock insuficiente. Disponible: "+string(rune(inventoryItem.Stock+'0'))), nil
+		return common.BadRequestResponse[responses.CartResponse](constants.CodeInsufficientStock, fmt.Sprintf("Stock insuficiente. Disponible: %d", inventoryItem.Stock)), nil
 	}
 
 	// Catalog is the source of truth for product name. Pharmacy returns "" intentionally.
