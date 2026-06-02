@@ -209,18 +209,34 @@ func (h *CheckoutHandler) Handle(ctx context.Context, cmd commands.CheckoutComma
 	})
 
 	if err != nil || !paymentResult.Success {
-		// Mark orders as payment_failed
+		failureMsg := "Error procesando el pago"
+		failureTxID := ""
+		if paymentResult != nil {
+			failureMsg = paymentResult.Message
+			failureTxID = paymentResult.TransactionID
+		}
+
+		// Mark orders as payment_failed and publish PAYMENT_FAILED per order
 		for _, order := range orderEntities {
 			order.PaymentStatus = string(entities.PaymentStatusFailed)
 			order.Status = string(entities.OrderStatusPendingPayment)
 			h.orderRepo.Update(ctx, order)
+
+			go func(o *entities.Order) {
+				event := events.NewOrderEvent(events.EventPaymentFailed).
+					WithOrder(o.ID, o.OrderNumber).
+					WithUser(cmd.UserID).
+					WithPharmacy(o.PharmacyID).
+					WithTotal(o.Total)
+				event.Metadata["transaction_id"] = failureTxID
+				event.Metadata["reason"] = failureMsg
+				if err := h.eventPublisher.Publish(context.Background(), event); err != nil {
+					h.logger.Error("Error publicando evento PAYMENT_FAILED", zap.Error(err))
+				}
+			}(order)
 		}
 
-		msg := "Error procesando el pago"
-		if paymentResult != nil {
-			msg = paymentResult.Message
-		}
-		return common.BadRequestResponse[responses.CheckoutResponse](constants.CodePaymentFailed, msg), nil
+		return common.BadRequestResponse[responses.CheckoutResponse](constants.CodePaymentFailed, failureMsg), nil
 	}
 
 	// 6. Payment success - update orders
@@ -239,7 +255,8 @@ func (h *CheckoutHandler) Handle(ctx context.Context, cmd commands.CheckoutComma
 
 		createdOrders[i].Status = string(entities.OrderStatusConfirmed)
 
-		// Publish event
+		// Publish ORDER_CREATED + PAYMENT_COMPLETED per order (fire-and-forget)
+		txID := paymentResult.TransactionID
 		go func(o *entities.Order) {
 			event := events.NewOrderEvent(events.EventOrderCreated).
 				WithOrder(o.ID, o.OrderNumber).
@@ -248,6 +265,19 @@ func (h *CheckoutHandler) Handle(ctx context.Context, cmd commands.CheckoutComma
 				WithTotal(o.Total)
 			if err := h.eventPublisher.Publish(context.Background(), event); err != nil {
 				h.logger.Error("Error publicando evento ORDER_CREATED", zap.Error(err))
+			}
+		}(order)
+
+		go func(o *entities.Order) {
+			event := events.NewOrderEvent(events.EventPaymentCompleted).
+				WithOrder(o.ID, o.OrderNumber).
+				WithUser(cmd.UserID).
+				WithPharmacy(o.PharmacyID).
+				WithTotal(o.Total)
+			event.Metadata["transaction_id"] = txID
+			event.Metadata["payment_method"] = cmd.PaymentMethod
+			if err := h.eventPublisher.Publish(context.Background(), event); err != nil {
+				h.logger.Error("Error publicando evento PAYMENT_COMPLETED", zap.Error(err))
 			}
 		}(order)
 	}

@@ -192,6 +192,20 @@ GET {USER}/api/v1/users/me/addresses/{addressID}
 
 **Tech debt:** resolver antes de la primera demo con UX que muestre historial de órdenes, o antes de Sprint 4 si Alert Service va a leer `product_snapshot` para construir notificaciones legibles.
 
+**Estado:** ✅ resuelto 2026-06-01. `AddCartItemHandler` recibe `catalogClient` (DI en `main.go`) y llama `GetProduct(ctx, productID)` después de validar inventario. El `Name` de catalog gana sobre `inventoryItem.ProductName`. Si catalog está caído se loggea WARN y se cae al valor de inventory (graceful degradation, no bloquea el cart-add). Backfill defensivo en el branch de update: si el item existente tenía `ProductName=""`, se llena en este pass. `CheckoutHandler` no necesitó cambios — lee `cartItem.ProductName` y ya viene enriquecido, así que el `order_items.product_snapshot` JSONB hereda el nombre correcto.
+
+### K19 — PAYMENT_COMPLETED / PAYMENT_FAILED no se publicaban (detectado 2026-05-13)
+
+`CheckoutHandler` publicaba `ORDER_CREATED` tras un pago exitoso pero **no** los eventos `PAYMENT_COMPLETED` ni `PAYMENT_FAILED`, aunque ambos estaban definidos en `internal/domain/events/order_events.go` y documentados en este archivo. Consumers downstream (Alert/Notification service en Sprint 4, Analytics futuro) quedaban ciegos al resultado del pago — solo veían la orden creada, sin saber si el cobro pasó o falló.
+
+**Síntoma:** ninguno en runtime; degradación silenciosa de la spec de eventos. Detectado durante el e2e del 2026-05-13.
+
+**Estado:** ✅ resuelto 2026-06-01. En `CheckoutHandler.Handle`:
+- Rama success: tras `paymentResult.Success`, se publica `PAYMENT_COMPLETED` por cada orden creada (paralelo a `ORDER_CREATED`), con `transaction_id` y `payment_method` en `Metadata`.
+- Rama failure: en el loop que marca `payment_status=failed`, se publica `PAYMENT_FAILED` por orden, con `transaction_id` (si lo hay) y `reason` (el `paymentResult.Message`) en `Metadata`.
+- Mismo patrón fire-and-forget que el resto del handler (`go func(o *entities.Order)` + `context.Background()`).
+- Una transacción de pago cubre N órdenes (multi-farmacia) → se emiten N eventos con el mismo `transaction_id` para que el consumer pueda correlacionar.
+
 ### Tech debt — request logging middleware
 
 order-service no loggea requests HTTP por default (solo logs estructurados desde handlers). Diagnosticar issues cross-service (como K16) requirió curl directo a downstream para inferir el flujo. Agregar middleware Zap-based que loggee method+path+status+latency por request mejoraría observabilidad local. Pharmacy-service ya tiene `middleware.Logger` de chi — replicar el patrón.

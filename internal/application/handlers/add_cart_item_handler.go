@@ -19,15 +19,17 @@ import (
 type AddCartItemHandler struct {
 	cartRepo       repositories.CartRepository
 	pharmacyClient services.PharmacyClient
+	catalogClient  services.CatalogClient
 	logger         *zap.Logger
 }
 
 func NewAddCartItemHandler(
 	cartRepo repositories.CartRepository,
 	pharmacyClient services.PharmacyClient,
+	catalogClient services.CatalogClient,
 	logger *zap.Logger,
 ) *AddCartItemHandler {
-	return &AddCartItemHandler{cartRepo: cartRepo, pharmacyClient: pharmacyClient, logger: logger}
+	return &AddCartItemHandler{cartRepo: cartRepo, pharmacyClient: pharmacyClient, catalogClient: catalogClient, logger: logger}
 }
 
 func (h *AddCartItemHandler) Handle(ctx context.Context, cmd commands.AddCartItemCommand) (*common.ApiResponse[responses.CartResponse], error) {
@@ -45,11 +47,26 @@ func (h *AddCartItemHandler) Handle(ctx context.Context, cmd commands.AddCartIte
 		return common.BadRequestResponse[responses.CartResponse](constants.CodeInsufficientStock, "Stock insuficiente. Disponible: "+string(rune(inventoryItem.Stock+'0'))), nil
 	}
 
+	// Catalog is the source of truth for product name. Pharmacy returns "" intentionally.
+	// Degrade gracefully: if catalog is unavailable, log and fall back to inventory.ProductName.
+	productName := inventoryItem.ProductName
+	if product, err := h.catalogClient.GetProduct(ctx, cmd.ProductID); err == nil && product != nil && product.Name != "" {
+		productName = product.Name
+	} else if err != nil {
+		h.logger.Warn("Catalog no disponible al enriquecer carrito; usando nombre de inventario",
+			zap.String("product_id", cmd.ProductID),
+			zap.Error(err),
+		)
+	}
+
 	// Check if item already exists in cart
 	existing, _ := h.cartRepo.FindByUserAndProduct(ctx, cmd.UserID, cmd.ProductID, cmd.PharmacyID)
 	if existing != nil {
 		existing.Quantity += cmd.Quantity
 		existing.UnitPrice = inventoryItem.Price
+		if existing.ProductName == "" && productName != "" {
+			existing.ProductName = productName
+		}
 		if err := h.cartRepo.Update(ctx, existing); err != nil {
 			h.logger.Error("Error actualizando item del carrito", zap.Error(err))
 			return common.InternalServerErrorResponse[responses.CartResponse]("Error actualizando carrito"), nil
@@ -62,7 +79,7 @@ func (h *AddCartItemHandler) Handle(ctx context.Context, cmd commands.AddCartIte
 			PharmacyID:   cmd.PharmacyID,
 			Quantity:     cmd.Quantity,
 			UnitPrice:    inventoryItem.Price,
-			ProductName:  inventoryItem.ProductName,
+			ProductName:  productName,
 			PharmacyName: inventoryItem.PharmacyName,
 		}
 		if err := h.cartRepo.Create(ctx, newItem); err != nil {

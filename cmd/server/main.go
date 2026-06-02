@@ -125,7 +125,7 @@ func main() {
 
 	// HTTP Clients
 	pharmacyClient := clients.NewPharmacyClient(cfg.Services.PharmacyService.BaseURL, zapLogger)
-	_ = clients.NewCatalogClient(cfg.Services.CatalogService.BaseURL, zapLogger)
+	catalogClient := clients.NewCatalogClient(cfg.Services.CatalogService.BaseURL, zapLogger)
 	userClient := clients.NewUserClient(cfg.Services.UserService.BaseURL, zapLogger)
 
 	// Payment Service
@@ -162,7 +162,7 @@ func main() {
 	getCartHandler := handlers.NewGetCartHandler(cartRepo, zapLogger)
 	mediator.RegisterHandler(med, getCartHandler)
 
-	addCartItemHandler := handlers.NewAddCartItemHandler(cartRepo, pharmacyClient, zapLogger)
+	addCartItemHandler := handlers.NewAddCartItemHandler(cartRepo, pharmacyClient, catalogClient, zapLogger)
 	mediator.RegisterHandler(med, addCartItemHandler)
 
 	updateCartItemHandler := handlers.NewUpdateCartItemHandler(cartRepo, zapLogger)
